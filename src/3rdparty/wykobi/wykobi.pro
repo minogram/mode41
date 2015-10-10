@@ -46,3 +46,7 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+DISTFILES += \
+    release-notes.txt \
+    wykobi_license.txt

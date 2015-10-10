@@ -72,8 +72,7 @@ HEADERS  += \
 #    wykobi/wykobi_utilities.hpp
 
 DISTFILES += \
-    Todo.txt \
-    wykobi/wykobi_license.txt
+    Todo.txt
 
 RESOURCES += \
     res/icons.qrc \

@@ -3,6 +3,5 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS = \
-    src \
+    src
 
-#src.depends = lib
