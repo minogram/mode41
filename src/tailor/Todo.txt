@@ -1,0 +1,25 @@
+TODO
+
++ image flat button
++ qt creator code folding like #region #endregion in c#
++ pen color by layer
++ DXF ASTM
++ free Svg Icons, https://commons.wikimedia.org/wiki/Comparison_of_icon_sets
++ open recent files
++ as-is: aama file->dxf model->scene, to-be: aama file->dxf model->ptn model->scene
++ new window
+================
+DONE
+
++ application icon
++ print
++ zoom fit after file load
++ polyline closed
++ file drop in window
++ mouse wheel zoom
++ when file open cancel
+================
+ICEBOX
+
++ Qt 5.6 support & Qt Creator VS 2015 support
++

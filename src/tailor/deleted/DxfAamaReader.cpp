@@ -1,0 +1,617 @@
+﻿#include <iostream>
+
+#include "DxfAamaReader.h"
+#include "DxfModel.h"
+
+#include <QDebug>
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
+
+//HEADER section – General information about the drawing. Each parameter has a variable name and an associated value.
+//CLASSES section – Holds the information for application-defined classes whose instances appear in the BLOCKS, ENTITIES, and OBJECTS sections of the database. Generally does not provide sufficient information to allow interoperability with other programs.
+//TABLES section – This section contains definitions of named items.
+//Application ID (APPID) table
+//Block Record (BLOCK_RECORD) table
+//Dimension Style (DIMSTYPE) table
+//Layer (LAYER) table
+//Linetype (LTYPE) table
+//Text style (STYLE) table
+//User Coordinate System (UCS) table
+//View (VIEW) table
+//Viewport configuration (VPORT) table
+
+//BLOCKS section – This section contains Block Definition entities describing the entities comprising each Block in the drawing.
+//ENTITIES section – This section contains the drawing entities, including any Block References.
+//OBJECTS section – Contains the data that apply to nongraphical objects, used by AutoLISP and ObjectARX applications.
+//THUMBNAILIMAGE section – Contains the preview image for the DXF file.
+//END OF FILE
+
+//using namespace dxf;
+
+DxfAamaReader::DxfAamaReader(QObject *parent)
+    : QObject(parent)
+{
+}
+
+dxf::DxfModel *DxfAamaReader::load(QString fileName)
+{
+    QFile file(fileName);
+
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::information(0, "error", file.errorString());
+    }
+
+    r.setDevice(&file);
+    m_model = new dxf::DxfModel(parent());
+    readSECTIONS();
+    file.close();
+
+    return m_model;
+}
+
+void DxfAamaReader::readAll()
+{
+    QString section = "";
+
+    r.readNext();
+    for (;;)
+    {
+        Q_ASSERT(r.code() == 0);
+
+        if (r.is(0, "EOF")) {
+            break;
+        }
+        else if (r.is(0, "SECTION")) {
+            r.readNext();
+            Q_ASSERT(r.is(2));
+            section = r.value();
+        }
+        else if (r.is(0, "ENDSEC")) {
+            Q_ASSERT(!section.isEmpty());
+            section = "";
+        }
+
+    }
+//    while (r.readNext())
+//    {
+//        Q_ASSERT(r.code() == 0);
+
+
+//    }
+}
+
+
+///
+/// \brief DxfAamaReader::readSECTIONS
+/// 0, SECTION
+/// 2, HEADER
+/// ...
+/// 0, ENDSEC
+///
+/// 0, SECTION
+/// 2, BLOCKS
+/// ...
+/// 0, ENDSEC
+///
+/// 0, EOF
+void DxfAamaReader::readSECTIONS()
+{
+    while (r.readUntil(0, "EOF"))
+    {
+        Q_ASSERT(r.is(0, "SECTION"));
+
+        if (r.is(0, "SECTION"))
+        {
+            readSECTION();
+        }
+    }
+}
+
+void DxfAamaReader::readSECTION()
+{
+    Q_ASSERT(r.is(0, "SECTION"));
+
+    r.readNext();
+
+    Q_ASSERT(r.code() == 2);
+
+    if (r.code() == 2)
+    {
+        //m_section = r.value();
+
+        if (r.value() == "HEADER")
+        {
+            r.skipTo(0, "ENDSEC");
+        }
+        else if (r.value() == "CLASSES")
+        {
+            r.skipTo(0, "ENDSEC");
+        }
+        else if (r.value() == "TABLESS")
+        {
+            r.skipTo(0, "ENDSEC");
+        }
+        else if (r.value() == "BLOCKS")
+        {
+            readBLOCKS(m_model->blocks);
+        }
+        else if (r.value() == "ENTITIES")
+        {
+            readENTITIES();
+        }
+        else if (r.value() == "OBJECTS")
+        {
+            r.skipTo(0, "ENDSEC");
+        }
+        else if (r.value() == "THUMBNAILIMAGE")
+        {
+            r.skipTo(0, "ENDSEC");
+        }
+        else
+        {
+            r.skipTo(0, "ENDSEC");
+        }
+    }
+}
+
+//void DxfAamaReader::readHEADER()
+//{
+//    Q_ASSERT(r.is(2, "HEADER"));
+
+//    r.skipTo(0, "ENDSEC");
+//}
+
+///
+/// \brief DxfAamaReader::readBLOCKS
+/// \param list
+///
+/// 0, SECTION
+/// 2, BLOCKS
+///
+/// 0, ENDSEC
+///
+void DxfAamaReader::readBLOCKS(dxf::DxfBlockList &list)
+{
+    Q_ASSERT(r.is(2, "BLOCKS"));
+
+    while (r.readUntil(0, "ENDSEC")) //r.readNext() && r.isNot(0, "ENDSEC"))
+    {
+        //if (r.is(0, "BLOCK")) //r.code() == 0 && r.value() == "BLOCK")
+        //{
+            readBLOCK(list);
+        //}
+    }
+
+    Q_ASSERT(r.is(0, "ENDSEC"));
+}
+
+/**
+ * 0, BLOCK
+ * 8, layer
+ * 2, name
+ * ... entities ...
+ * 0, ENDBLOCK
+ * @brief DxfAamaReader::readBLOCK
+ * @param list
+ */
+void DxfAamaReader::readBLOCK(dxf::DxfBlockList &list)
+{
+    Q_ASSERT(r.is(0, "BLOCK"));
+
+    auto block = new dxf::DxfBlock(m_model->parent());
+
+    // block attribute
+
+    while (r.readUntil(0, "ENDBLK"))
+    //while (r.readNext() && r.isNot(0, "ENDBLK"))
+    {
+        if (r.code() == 8) // layer name
+        {
+            block->layer = r.value();
+        }
+        else if (r.code() == 2) // block name
+        {
+            block->name = r.value();
+        }
+        else if (r.code() == 70) // block flags
+        {
+            block->flags = r.value().toInt();
+            // todo;
+//            Block-type flags (bit coded values, may be combined):
+//            1 = This is an anonymous block generated by hatching, associative dimensioning, other internal operations, or an application
+//            2 = This block has attribute definitions
+//            4 = This block is an external reference (xref)
+//            8 = This block is an xref overlay
+//            16 = This block is externally dependent
+//            32 = This is a resolved external reference, or dependent of an external reference (ignored on input)
+//            64 = This definition is a referenced external reference (ignored on input)
+        }
+        else if (r.code() == 10)
+        {
+            block->x = r.value().toDouble();
+        }
+        else if (r.code() == 20)
+        {
+            block->y = r.value().toDouble();
+        }
+        else if (r.code() == 30)
+        {
+            block->z = r.value().toDouble();
+        }
+        else if (r.code() == 0)
+        {
+            readENTITY(block->entities);
+        }
+    }
+
+    list.append(block);
+}
+
+void DxfAamaReader::readENTITIES()
+{
+    Q_ASSERT(r.is(2, "ENTITIES"));
+
+    r.skipTo(0, "ENDSEC");
+}
+
+void DxfAamaReader::readENTITY(dxf::DxfEntityList &list)
+{
+    Q_ASSERT(r.is(0));
+
+    if (r.value() == "LINE")
+    {
+        readLINE(list);
+    }
+    else if (r.value() == "POLYLINE")
+    {
+        readPOLYLINE(list);
+    }
+    else if (r.value() == "CIRCLE")
+    {
+        while (r.readNext() && r.is(0)); // skipTo(0);
+    }
+    else if (r.value() == "TEXT")
+    {
+        readTEXT(list);
+    }
+    else if (r.value() == "POINT")
+    {
+        readPOINT(list);
+    }
+    else
+    {
+        r.skipTo(0);
+        //skipTo(0);
+        qDebug() << "unknown entity: " << r.value();
+    }
+}
+
+void DxfAamaReader::readPOINT(dxf::DxfEntityList &list)
+{
+    Q_ASSERT(r.is(0, "POINT"));
+
+    auto point = new dxf::DxfPoint(m_model->parent());
+
+    while (r.readNext() && r.isNot(0))
+    {
+        if (r.code() == 8) // layer name
+        {
+            point->layer = r.value();
+        }
+        else if (r.code() == 10) // x1
+        {
+            point->x = r.value().toDouble();
+        }
+        else if (r.code() == 20) // y1
+        {
+            point->y = r.value().toDouble();
+        }
+        else if (r.code() == 30) // z1
+        {
+            point->z = r.value().toDouble();
+        }
+        else if (r.code() == 38)
+        {
+            // todo: notch length
+        }
+        else if (r.code() == 39)
+        {
+            // todo: notch width
+        }
+        else if (r.code() == 50)
+        {
+            // todo: angle
+        }
+        else
+        {
+            qDebug() << "POINT UNKNOWN: " << r.code() << ", " << r.code();
+        }
+    }
+
+    if (point) list.append(point);
+
+//    switch (layer)
+//                {
+//                    case 0:
+//                        break;
+//                    case 2:
+//                        //if (design.Author == "SCANVEC GARMENT SYSTEMS")
+//                        //{
+//                              //SetTurnPoint(paths, point);
+//                        //}
+//                        SetCuspPoint(paths, point);
+//                        break;
+//                    case 4:
+//                        PatternNotch notch = new PatternNotch();
+//                        notch.Length = notchLength;
+//                        notch.Angle = angle;
+//                        notch.Location = point;
+//                        //if (lastPath != null)
+//                        //    lastPath.Notchs.Add(notch);
+//                        if (paths != null)
+//                            SetNotchPoint(paths, notch);
+//                        break;
+//                    case 13:
+//                        PatternDrillHole hole = new PatternDrillHole();
+//                        hole.Location = point;
+//                        piece.Entities.Add(hole);
+//                        break;
+//                    case 3:
+//                        //if (!(design.Author == "SCANVEC GARMENT SYSTEMS"))
+//                        //{
+//                        //    if (lastPath != null)
+//                        //        SetCurvePoint(lastPath, point);
+//                        //}
+//                        //else
+//                        //{
+//                        if (paths != null)
+//                            SetCurvePoint(paths, point);
+//                        //}
+//                        break;
+//                    default:
+//                        //TODO :
+//                        break;
+//                }
+
+    //MoveNext();
+
+
+//    100
+//    Subclass marker (AcDbPoint)
+//    10
+//    Point location (in WCS)
+//    DXF: X value; APP: 3D point
+//    20, 30
+//    DXF: Y and Z values of point location (in WCS)
+//    39
+//    Thickness (optional; default = 0)
+//    210
+//    Extrusion direction (optional; default = 0, 0, 1)
+//    DXF: X value; APP: 3D vector
+//    220, 230
+//    DXF: Y and Z values of extrusion direction (optional)
+//    50
+//    Angle of the X axis for the UCS in effect when the point was drawn (optional, default = 0); used when PDMODE is nonzero
+}
+
+void DxfAamaReader::readTEXT(dxf::DxfEntityList &list)
+{
+    Q_ASSERT(r.is(0, "TEXT"));
+
+    auto entity = new dxf::DxfText(m_model->parent());
+    while (r.readNext() && r.isNot(0))
+    {
+        if (r.code() == 1)
+        {
+            entity->text = r.value();
+            //qDebug() << entity->text;
+        }
+        else if (r.code() == 8)
+        {
+            entity->layer = r.value();
+            //qDebug() << entity->layer;
+        }
+        else if (r.code() == 10) // x1
+        {
+            entity->x = r.value().toDouble();
+        }
+        else if (r.code() == 20) // y1
+        {
+            entity->y = r.value().toDouble();
+        }
+        else if (r.code() == 30) // z1
+        {
+            entity->z = r.value().toDouble();
+        }
+        else if (r.code() == 40) // size
+        {
+            entity->size = r.value().toDouble();
+        }
+    }
+    list.append(entity);
+}
+
+void DxfAamaReader::readLINE(dxf::DxfEntityList &list)
+{
+    Q_ASSERT(r.is(0, "LINE"));
+
+    auto line = new dxf::DxfLine(m_model->parent());
+
+    while (r.readNext() && r.isNot(0))
+    //for (r.readNext(); r.isNot(0); r.readNext())
+    {
+        if (r.code() == 8) // layer name
+        {
+            line->layer = r.value();
+        }
+        else if (r.code() == 10) // x1
+        {
+            line->x1 = r.value().toDouble();
+        }
+        else if (r.code() == 20) // y1
+        {
+            line->y1 = r.value().toDouble();
+        }
+        else if (r.code() == 30) // z1
+        {
+            line->z1 = r.value().toDouble();
+        }
+        else if (r.code() == 11) // x2
+        {
+            line->x2 = r.value().toDouble();
+        }
+        else if (r.code() == 21) // y2
+        {
+            line->y2 = r.value().toDouble();
+        }
+        else if (r.code() == 31) // z2
+        {
+            line->z2 = r.value().toDouble();
+        }
+        else
+        {
+            qDebug() << "POINT UNKNOWN: " << r.code() << ", " << r.code();
+        }
+    }
+
+    Q_ASSERT(line != nullptr);
+    list.append(line);
+}
+
+void DxfAamaReader::readPOLYLINE(dxf::DxfEntityList &list)
+{
+    Q_ASSERT(r.is(0, "POLYLINE"));
+
+    auto polyline = new dxf::DxfPolyline(m_model->parent());
+
+    //for (r.readNext(); r.isNot(0); r.readNext())
+    while (r.readNext() && r.isNot(0))
+    {
+        if (r.code() == 66)
+        {
+
+        }
+        else if (r.code() == 8)
+        {
+            polyline->layer = r.value();
+        }
+        else if (r.code() == 70)
+        {
+//            Polyline flag (bit-coded); default is 0:
+//            1 = This is a closed polyline (or a polygon mesh closed in the
+//            M direction).
+//            2 = Curve-fit vertices have been added.
+//            4 = Spline-fit vertices have been added.
+//            8 = This is a 3D polyline.
+//            16 = This is a 3D polygon mesh.
+//            32 = The polygon mesh is closed in the N direction.
+//            64 = The polyline is a polyface mesh.
+//            128 = The linetype pattern is generated continuously around the vertices of this polyline.
+            polyline->flags = r.value().toInt();
+        }
+        else
+        {
+            qDebug() << "POLYLINE UNKNOWN: " << r.code() << ", " << r.code();
+        }
+    }
+
+    Q_ASSERT(r.code() == 0);
+
+    for (;;)
+    {
+        if (r.value() == "SEQEND")
+        {
+            readENDSEQ();
+            break;
+        }
+        else if (r.value() == "VERTEX")
+        {
+            readVERTEX(polyline->vertices);
+        }
+        else
+        {
+            qDebug() << "expected: vertex, endseq";
+        }
+    }
+
+    if (polyline)
+    {
+        list.append(polyline);
+    }
+}
+
+// 0 POLYLINE
+// 10 <X>
+// 20 <Y>
+// 0 VERTEX
+// 10 <X>
+// 20 <Y>
+// 0 VERTEX
+// 10 <X>
+// 20 <Y>
+// 0 SEQEND
+// 8 1
+// -- expect 0 POLYLINE
+void DxfAamaReader::readVERTEX(dxf::DxfVertexList &list)
+{
+    Q_ASSERT(r.is(0, "VERTEX"));
+
+    dxf::DxfVertex *vertex = nullptr;
+
+    if (r.value() == "VERTEX")
+    {
+        vertex = new dxf::DxfVertex(m_model->parent());
+    }
+
+    while (r.readNext() && r.isNot(0))
+    {
+        if (r.code() == 8)
+        {
+            vertex->layer = r.value();
+        }
+        else if (r.code() == 10)
+        {
+            vertex->x = r.value().toDouble();
+        }
+        else if (r.code() == 20)
+        {
+            vertex->y = r.value().toDouble();
+        }
+        else if (r.code() == 70)
+        {
+            vertex->flags = r.value().toInt();
+        }
+        else
+        {
+            qDebug() << "UNEXPECTEd in vertex:???? " << r.code() << ", " << r.value();
+        }
+    }
+
+    if (vertex)
+    {
+        list.append(vertex);
+    }
+
+    Q_ASSERT(r.code() == 0);
+}
+
+void DxfAamaReader::readENDSEQ()
+{
+    Q_ASSERT(r.is(0, "SEQEND"));
+
+    while (r.readNext() && r.isNot(0))
+    {
+        if (r.code() == 8)
+        {
+            // todo:
+        }
+        else
+        {
+            qDebug() << "UNEXPECted in seqend: " << r.code() << ", " << r.value();
+        }
+    }
+
+    Q_ASSERT(r.code() == 0);
+}
