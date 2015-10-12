@@ -3,7 +3,10 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS = \
+    3rdparty \
+    modules \
     tailor \
-    3rdparty
+    viewer \
 
-#src.depends = lib
+tailor.depends = modules
+viewer.depends = modules

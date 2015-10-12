@@ -50,3 +50,5 @@ unix {
 DISTFILES += \
     release-notes.txt \
     wykobi_license.txt
+
+include($$PWD/../../shared.pri)

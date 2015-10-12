@@ -3,6 +3,7 @@ TEMPLATE = subdirs
 CONFIG += ordered
 
 SUBDIRS = \
-    wykobi
+    wykobi \
+    freeimage
 
 #src.depends = lib

@@ -10,6 +10,8 @@ PtnGraphicsView::PtnGraphicsView(QWidget *parent)
 
 void PtnGraphicsView::mousePressEvent(QMouseEvent *e)
 {
+    Q_UNUSED(e)
+
 //    m_down = true;
 //    m_downView = e->pos();
 //    m_downScene = mapToScene(e->pos());
@@ -18,12 +20,14 @@ void PtnGraphicsView::mousePressEvent(QMouseEvent *e)
 
 void PtnGraphicsView::mouseReleaseEvent(QMouseEvent *e)
 {
+    Q_UNUSED(e)
 //    m_down = false;
 //    e->accept();
 }
 
 void PtnGraphicsView::mouseMoveEvent(QMouseEvent *e)
 {
+    Q_UNUSED(e)
 //    if (m_down) {
 //        //QPoint currView = e->pos();
 //        e->accept();
