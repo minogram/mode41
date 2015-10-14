@@ -1,9 +1,13 @@
 #include "HpglDocument.h"
-#include "HpglParser.h"
-#include <QtCore>
 
-HpglDocument::HpglDocument()
-{
+//HpglDocumentData::HpglDocumentData()
+//    : QSharedData()
+//{
+//}
 
-}
+//HpglDocument::HpglDocument()
+//{
+//    d = new HpglDocumentData;
+//}
 
+ //HpglDocument(); // { d = new HpglDocumentData; }

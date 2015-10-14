@@ -7,19 +7,19 @@
 
 HpglTextReader::HpglTextReader()
 {
-//    var patterns = new string[]
-//               {
-//                   //@"\x1B\x25\x2D1B",      // [ESC]%-1B
-//                   @"\x1B%-1B",            // [ESC]%-1B
-//                   @"\x1B",                // [ESC]
+////    var patterns = new string[]
+////               {
+////                   //@"\x1B\x25\x2D1B",      // [ESC]%-1B
+////                   @"\x1B%-1B",            // [ESC]%-1B
+////                   @"\x1B",                // [ESC]
 
-//                   @"(?s-imnx:LB.*?\x03)", // LB ... [ETX]
-//                   @"(?sm-inx:LB.*?^;)",   // LB ... ^;
+////                   @"(?s-imnx:LB.*?\x03)", // LB ... [ETX]
+////                   @"(?sm-inx:LB.*?^;)",   // LB ... ^;
 
-//                   @"[A-Z]{2}[0-9,*\-\.]*", // AA....
-//               };
+////                   @"[A-Z]{2}[0-9,*\-\.]*", // AA....
+////               };
 
-//               return string.Format(@"({0})", string.Join("|", patterns));
+////               return string.Format(@"({0})", string.Join("|", patterns));
 
     QString pattern =
             "[A-Z]{2}[0-9,*\\-\\.]*"; // 2 letters and numbers
@@ -28,20 +28,15 @@ HpglTextReader::HpglTextReader()
     m_regex.setPatternOptions(QRegularExpression::MultilineOption);
 }
 
-QSharedPointer<HpglDocument> HpglTextReader::load(const QString &filePath)
+HpglDocument HpglTextReader::load(const QString &filePath)
 {
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly)) {
         throw QException();
     }
+    QTextStream in(&file);
 
-    in.setDevice(&file);
-
-    m_doc = QSharedPointer<HpglDocument>::create();
-
-    //m_doc = QSharedPointer<HpglDocument>::create();
-
-    qDebug()<< "===============================";
+    HpglDocument doc;
 
     while (!in.atEnd())
     {
@@ -51,23 +46,32 @@ QSharedPointer<HpglDocument> HpglTextReader::load(const QString &filePath)
         auto i = m_regex.globalMatch(line);
         while (i.hasNext()) {
             auto match = i.next();
-            doCmd(match.captured());
+            auto cmd = match.captured();
+            auto name = cmd.mid(0, 2);
+            auto argument = cmd.mid(2);
+            doc.items().append(HpglCommand(name, argument));
         }
     }
 
     file.close();
-    return m_doc;
+    return doc;
 }
 
-void HpglTextReader::doCmd(const QString &line)
+QList<QPointF> HpglTextReader::parsePoints(const QString &arg)
 {
-    if (line.isEmpty()) return;
+    QList<QPointF> points;
 
-    //Q_ASSERT(!line.contains(";"));
-    //qDebug() << cmd;
-    auto name = line.mid(0, 2);
-    auto argument = line.mid(2);
-    HpglCommand cmd(name, argument);
+    auto args = arg.split(",");
+    //Q_ASSERT(args.size() % 2 == 0);
 
-    m_doc->items.append(cmd);
+    for (int i=0; i<args.size(); i+=2)
+    {
+        float x = args[i].toFloat();
+        if (i+1 < args.size())
+        {
+            float y = args[i+1].toFloat();
+            points.append(QPointF(x, y));
+        }
+    }
+    return points;
 }

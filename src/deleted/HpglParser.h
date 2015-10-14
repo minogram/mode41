@@ -3,26 +3,19 @@
 
 #include <QTextStream>
 #include <QString>
+#include <QRegularExpression>
 
 class HpglParser
 {
-//    enum State {
-//        NONE,
-//        CMD,
-//        WHITESPACE,
-//        COMMA,
-//        SEMICOLON,
-//    };
-
 private:
     HpglParser();
 
-//    QTextStream in;
-//    QString m_read;
-//    void read();
-//    QString peek();
 public:
+    static const QString &parseLine(const QString &data);
     static QList<QPointF> parsePoints(const QString &arg);
+
+private:
+    static QRegularExpression m_regex;
 };
 
 #endif // HPGLPARSER_H

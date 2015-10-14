@@ -7,7 +7,7 @@
 class HpglPaintable
 {
 public:
-    HpglPaintable(HpglDocument *hpgl);
+    HpglPaintable(const HpglDocument &hpgl);
     void paint(QPainter *painter);
 
 signals:
@@ -15,7 +15,7 @@ signals:
 public slots:
 
 private:
-    HpglDocument *m_doc;
+    HpglDocument m_doc;
 };
 
 #endif // HPGLPAINTABLE_H

@@ -14,7 +14,6 @@ DEFINES += HPGL_LIBRARY
 
 SOURCES += \
     HpglDocument.cpp \
-    HpglParser.cpp \
     HpglPaintable.cpp \
     HpglTextReader.cpp \
     HpglCommand.cpp
@@ -22,7 +21,6 @@ SOURCES += \
 HEADERS += Hpgl.h\
         hpgl_global.h \
     HpglDocument.h \
-    HpglParser.h \
     HpglPaintable.h \
     HpglTextReader.h \
     HpglCommand.h

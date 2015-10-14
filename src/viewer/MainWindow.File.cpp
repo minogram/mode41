@@ -191,7 +191,7 @@ void MainWindow::openHpgl(const QFileInfo &fileInfo)
     QPicture picture;
     QPainter painter;
     painter.begin(&picture);
-    HpglPaintable paintable(doc.data());
+    HpglPaintable paintable(doc);
     paintable.paint(&painter);
     painter.end();
 
@@ -199,26 +199,6 @@ void MainWindow::openHpgl(const QFileInfo &fileInfo)
     scene->clear();
     auto item = new QXGraphicsPictureItem(picture);
     scene->addItem(item);
-
-//    HpglReader r;
-//    auto hpgl = r.load(fileInfo.filePath());
-
-//    QPainterPath ppath;
-//    foreach (auto item, hpgl->items) {
-//        auto itemPoints = qSharedPointerCast<HpglPoints>(item);
-//        if (itemPoints.isNull()) break;
-//        foreach (auto point, itemPoints->m_points) {
-//            ppath.lineTo(point);
-//        }
-//    }
-
-//    QPen pen;
-//    pen.setColor(Qt::red); //color);
-//    pen.setWidth(1);
-//    pen.setCosmetic(true);
-
-//    auto scene = m_view->scene();
-//    scene->addPath(ppath, pen);
 }
 
 bool MainWindow::maybeSave()
