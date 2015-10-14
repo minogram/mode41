@@ -33,13 +33,23 @@ INCLUDEPATH += src \
     ../modules/qx \
     ../modules/dxf \
     ../modules/pgm \
+    ../modules/hpgl
 
 
 LIBS += \
     -L$$ROOTDIR/mode41-build/src/modules/dxf/debug -ldxf \
     -L$$ROOTDIR/mode41-build/src/modules/qx/debug -lqx \
     -L$$ROOTDIR/mode41-build/src/modules/pgm/debug -lpgm \
+    -L$$ROOTDIR/mode41-build/src/modules/hpgl/debug -lhpgl \
     -L$$ROOTDIR/mode41/src/3rdparty/freeimage/x32 -lfreeimage \
+
+# TODO:
+PRE_TARGETDEPS += \
+    C:\dev\mode41-build\src\modules\dxf\debug\dxf.lib \
+    C:\dev\mode41-build\src\modules\hpgl\debug\hpgl.lib \
+
+# TODO
+QTPLUGIN += psd
 
 release: DESTDIR = release
 debug: DESTDIR = debug

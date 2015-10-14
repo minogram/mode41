@@ -5,11 +5,11 @@
 #include <QImage>
 #include <FreeImage.h>
 
-FreeImage2QImage::FreeImage2QImage()
+QFreeImage::QFreeImage()
 {
 }
 
-QImage FreeImage2QImage::load(const QString &filePath)
+QImage QFreeImage::load(const QString &filePath)
 {
     // todo: check freeimage_initailise() no need?
 //    FreeImage_Initialise();
@@ -31,29 +31,29 @@ QImage FreeImage2QImage::load(const QString &filePath)
     //    FreeImage_DeInitialise();
 }
 
-QImage& FreeImage2QImage::QImageNone()
+QImage& QFreeImage::QImageNone()
 {
     static QImage none(0, 0, QImage::Format_Invalid);
     return none;
 }
 
-bool FreeImage2QImage::IsQImageNone(const QImage& img)
+bool QFreeImage::IsQImageNone(const QImage& img)
 {
     return img == QImageNone();
 }
 
-QVector<QRgb>& FreeImage2QImage::PaletteNone()
+QVector<QRgb>& QFreeImage::PaletteNone()
 {
     static QVector<QRgb> none = QVector<QRgb>();
     return none;
 }
 
-bool FreeImage2QImage::IsPaletteNone(const QVector<QRgb>& pal)
+bool QFreeImage::IsPaletteNone(const QVector<QRgb>& pal)
 {
     return pal == PaletteNone();
 }
 
-QVector<QRgb> FreeImage2QImage::GetPalette(FIBITMAP *dib)
+QVector<QRgb> QFreeImage::GetPalette(FIBITMAP *dib)
 {
     if (dib != NULL &&  FreeImage_GetBPP(dib) <= 8)
     {
@@ -80,7 +80,7 @@ QVector<QRgb> FreeImage2QImage::GetPalette(FIBITMAP *dib)
     return PaletteNone();
 }
 
-QImage FreeImage2QImage::FIBitmapToQImage(FIBITMAP *dib)
+QImage QFreeImage::FIBitmapToQImage(FIBITMAP *dib)
 {
     //FreeImage_GetFileType()
     //FreeImage_GetFileTypeU();

@@ -10,10 +10,10 @@
 /// original source is
 /// https://github.com/zoon/FreeImage-Plugin-for-QT4
 ///
-class FreeImage2QImage
+class QFreeImage
 {
 private:
-    FreeImage2QImage();
+    QFreeImage();
 
 public:
     static QImage load(const QString &filePath);

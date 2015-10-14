@@ -15,6 +15,7 @@
 #include "PtnModel.h"
 #include "QXGraphicsPictureItem.h"
 #include "FreeImage2QImage.h"
+#include "Hpgl.h"
 
 void MainWindow::fileNew()
 {
@@ -30,13 +31,14 @@ void MainWindow::open()
         dialog.setFileMode(QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog :: Detail);
         QStringList filters;
+        filters.append(tr("All files (*.*)"));
         filters.append(tr("Bitmap (*.png *.jpg *.bmp)"));
         filters.append(tr("SVG (*.svg *.svgz)"));
         filters.append(tr("DXF (*.dxf)"));
         filters.append(tr("Photoshop (*.psd)"));
         filters.append(tr("Macintosh PICT (*.pct *.pict)"));
         filters.append(tr("TruevVision TARGA (*.tga *.targa)"));
-        filters.append(tr("All files (*.*)"));
+        filters.append(tr("Hpgl (*.hpgl *.plt *.gl *.hpg *.hp2)"));
         dialog.setNameFilters(filters);
 
 #ifdef QT_DEBUG
@@ -64,7 +66,7 @@ void MainWindow::openFile(const QString &fileName)
             bool loaded = false;
             QFileInfo fileInfo(fileName);
             auto extension = fileInfo.suffix().toLower();
-            if (extension == "png" || extension == "jpg" || extension == "bmp")
+            if (extension == "png" || extension == "jpg" || extension == "bmp" || extension == "psd")
             {
                 openImage(fileInfo);
                 loaded = true;
@@ -79,11 +81,16 @@ void MainWindow::openFile(const QString &fileName)
                 openDxf(fileInfo);
                 loaded = true;
             }
-            else if (extension == "psd" || extension == "pct" || extension == "pict" || extension == "tga" || extension == "targa")
+            else if (extension == "hpgl" || extension == "plt" || extension == "gl" || extension == "hpg" || extension == "hp2")
             {
-                openPsd(fileInfo);
+                openHpgl(fileInfo);
                 loaded = true;
             }
+//            else if (extension == "psd" || extension == "pct" || extension == "pict" || extension == "tga" || extension == "targa")
+//            {
+//                openPsd(fileInfo);
+//                loaded = true;
+//            }
 
             if (loaded) {
                 setWindowTitle(fileInfo.fileName());
@@ -168,12 +175,50 @@ void MainWindow::openDxf(const QFileInfo &fileInfo)
 
 void MainWindow::openPsd(const QFileInfo &fileInfo)
 {
-    auto image = FreeImage2QImage::load(fileInfo.absoluteFilePath());
+    auto image = QFreeImage::load(fileInfo.absoluteFilePath());
     auto pixmap = QPixmap::fromImage(image);
 
     auto scene = m_view->scene();
     scene->clear();
     scene->addPixmap(pixmap);
+}
+
+void MainWindow::openHpgl(const QFileInfo &fileInfo)
+{
+    HpglTextReader reader;
+    auto doc = reader.load(fileInfo.absoluteFilePath());
+
+    QPicture picture;
+    QPainter painter;
+    painter.begin(&picture);
+    HpglPaintable paintable(doc.data());
+    paintable.paint(&painter);
+    painter.end();
+
+    auto scene = m_view->scene();
+    scene->clear();
+    auto item = new QXGraphicsPictureItem(picture);
+    scene->addItem(item);
+
+//    HpglReader r;
+//    auto hpgl = r.load(fileInfo.filePath());
+
+//    QPainterPath ppath;
+//    foreach (auto item, hpgl->items) {
+//        auto itemPoints = qSharedPointerCast<HpglPoints>(item);
+//        if (itemPoints.isNull()) break;
+//        foreach (auto point, itemPoints->m_points) {
+//            ppath.lineTo(point);
+//        }
+//    }
+
+//    QPen pen;
+//    pen.setColor(Qt::red); //color);
+//    pen.setWidth(1);
+//    pen.setCosmetic(true);
+
+//    auto scene = m_view->scene();
+//    scene->addPath(ppath, pen);
 }
 
 bool MainWindow::maybeSave()

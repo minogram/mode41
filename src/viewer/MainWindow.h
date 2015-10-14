@@ -41,6 +41,7 @@ private:
     void openSvg(const QFileInfo &fileInfo);
     void openDxf(const QFileInfo &fileInfo);
     void openPsd(const QFileInfo &fileInfo);
+    void openHpgl(const QFileInfo &fileInfo);
 
     bool maybeSave();
 

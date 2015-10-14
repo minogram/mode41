@@ -1,11 +1,15 @@
 #include "MainWindow.h"
+#include <QtPlugin>
 #include <QApplication>
+
+//Q_IMPORT_PLUGIN(psd)
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+    QApplication app(argc, argv);
 
-    return a.exec();
+    MainWindow wnd;
+    wnd.show();
+
+    return app.exec();
 }

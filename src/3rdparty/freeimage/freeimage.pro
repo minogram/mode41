@@ -10,9 +10,9 @@ TARGET = freeimage
 TEMPLATE = lib
 CONFIG += staticlib
 
-SOURCES += Freeimage.cpp
+SOURCES +=
 
-HEADERS += Freeimage.h
+HEADERS +=
 unix {
     target.path = /usr/lib
     INSTALLS += target
