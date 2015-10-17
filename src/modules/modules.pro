@@ -6,6 +6,7 @@ SUBDIRS = \
     qx \
     dxf \
     pgm \
-    hpgl
+    hpgl \
+    sketch2010
 
 pgm.depends = dxf

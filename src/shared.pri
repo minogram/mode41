@@ -19,20 +19,23 @@ INCLUDEPATH += src \
     $$SRC_DIR/src/modules/dxf \
     $$SRC_DIR/src/modules/pgm \
     $$SRC_DIR/src/modules/hpgl \
-
-#LIBS += \
-#    -L$$SRC_DIR/src/3rdparty/freeimage/x32 -lfreeimage \
-#    -L$$BUILD_DIR/src/modules/qx/debug -lqx \
-#    -L$$BUILD_DIR/src/modules/dxf/debug -ldxf \
-#    -L$$BUILD_DIR/src/modules/pgm/debug -lpgm \
-#    -L$$BUILD_DIR/src/modules/hpgl/debug -lhpgl \
+    $$SRC_DIR/src/modules/sketch2010 \
 
 LIBS += \
     -L$$SRC_DIR/src/3rdparty/freeimage/x32 -lfreeimage \
-    -L$$BUILD_DIR/src/modules/qx/release -lqx \
-    -L$$BUILD_DIR/src/modules/dxf/release -ldxf \
-    -L$$BUILD_DIR/src/modules/pgm/release -lpgm \
-    -L$$BUILD_DIR/src/modules/hpgl/release -lhpgl \
+    -L$$BUILD_DIR/src/modules/qx/debug -lqx \
+    -L$$BUILD_DIR/src/modules/dxf/debug -ldxf \
+    -L$$BUILD_DIR/src/modules/pgm/debug -lpgm \
+    -L$$BUILD_DIR/src/modules/hpgl/debug -lhpgl \
+    -L$$BUILD_DIR/src/modules/sketch2010/debug -lsketch2010 \
+
+#LIBS += \
+#    -L$$SRC_DIR/src/3rdparty/freeimage/x32 -lfreeimage \
+#    -L$$BUILD_DIR/src/modules/qx/release -lqx \
+#    -L$$BUILD_DIR/src/modules/dxf/release -ldxf \
+#    -L$$BUILD_DIR/src/modules/pgm/release -lpgm \
+#    -L$$BUILD_DIR/src/modules/hpgl/release -lhpgl \
+#    -L$$BUILD_DIR/src/modules/sketch2010/release -lsketch2010 \
 
 
 #########################

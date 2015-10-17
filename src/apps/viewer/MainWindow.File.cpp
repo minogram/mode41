@@ -17,6 +17,7 @@
 #include "FreeImage2QImage.h"
 #include "Hpgl.h"
 #include "HpglPainterPlay.h"
+#include "SketchModel.h"
 
 void MainWindow::fileNew()
 {
@@ -40,6 +41,7 @@ void MainWindow::open()
         filters.append(tr("Macintosh PICT (*.pct *.pict)"));
         filters.append(tr("TruevVision TARGA (*.tga *.targa)"));
         filters.append(tr("Hpgl (*.hpgl *.plt *.gl *.hpg *.hp2)"));
+        filters.append(tr("Sketch (*.xml)"));
         dialog.setNameFilters(filters);
 
 #ifdef QT_DEBUG
@@ -85,6 +87,11 @@ void MainWindow::openFile(const QString &fileName)
             else if (extension == "hpgl" || extension == "plt" || extension == "gl" || extension == "hpg" || extension == "hp2")
             {
                 openHpgl(fileInfo);
+                loaded = true;
+            }
+            else if (extension == "xaml")
+            {
+                openSketch(fileInfo);
                 loaded = true;
             }
 //            else if (extension == "psd" || extension == "pct" || extension == "pict" || extension == "tga" || extension == "targa")
@@ -208,6 +215,14 @@ void MainWindow::openHpgl(const QFileInfo &fileInfo)
     auto item = new QXGraphicsPictureItem(picture);
     scene->addItem(item);
 #endif
+}
+
+void MainWindow::openSketch(const QFileInfo &fileInfo)
+{
+    SketchModel model;
+    model.load(fileInfo.absoluteFilePath());
+
+    qDebug() << "sketch";
 }
 
 bool MainWindow::maybeSave()

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl printsupport svg
+QT       += core gui opengl printsupport svg xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -32,6 +32,7 @@ QTPLUGIN += psd
 PRE_TARGETDEPS += \
     C:\dev\mode41-build\src\modules\dxf\debug\dxf.lib \
     C:\dev\mode41-build\src\modules\hpgl\debug\hpgl.lib \
+    C:\dev\mode41-build\src\modules\sketch2010\debug\sketch2010.lib \
 
 viewer.depends = dxf hpgl
 
