@@ -2,41 +2,52 @@
 #define HPGLDOCUMENT_H
 
 #include <QtCore>
+#include "HpglDocument_p.h"
 #include "HpglCommand.h"
 
-class HpglDocumentData;
+//template <typename T>
+//class Shared
+//{
+//    Shared() { d = new T(); }
+//    Shared(std::nullptr_t null) { }
+//    bool isNull() { return d.data() == nullptr; }
+//protected:
+//    QExplicitlySharedDataPointer<T> d;
+//};
 
-class HpglDocumentData : public QSharedData
-{
-public:
-    HpglDocumentData() {}
-    HpglDocumentData(const HpglDocumentData &other)
-        : QSharedData(other)
-        , items(other.items) {}
-    ~HpglDocumentData() {}
+//#define DECLARE_SHARED(T) \
+//public: \
+//    T(std::nullptr_t null) {} \
+//    T() : d(new T)
+//#endif
 
-    QList<HpglCommand> items;
-};
-
+///
+/// \brief The HpglDocument class
+///
+/// class Something
+/// - define Something()
+/// - define Something(const Something &)
+/// - define isNull()
+/// - has only one QExplicitlySharedDataPointer<SomethingPrivate> d;
+/// - define all member methods here
+///
+/// class SomethingPrivate : public QSharedData
+/// - define all member variables here
+///
 class HpglDocument
 {
 public:
-    HpglDocument() { d = new HpglDocumentData; }
-    HpglDocument(const HpglDocument &other)
-        : d(other.d) {}
+    HpglDocument(std::nullptr_t null);
+    HpglDocument();
+    HpglDocument(const HpglDocument &other);
+    bool isNull() { return d.data() == nullptr; }
 
-    // todo: QList<HpglCommand> items() - this not work, strange...
-    QList<HpglCommand> &items() const { return d->items; }
-private:
-    //QList<HpglCommand> m_items;
-    //QSharedDataPointer<HpglDocumentData> d;
-    QExplicitlySharedDataPointer<HpglDocumentData> d;
+    QList<HpglCommand> &items() { return d->items; }
+protected:
+    QExplicitlySharedDataPointer<HpglDocumentPrivate> d;
 };
 
-//Q_PRIMITIVE_TYPE specifies that Type is a POD (plain old data) type with no constructor or destructor, or else a type where every bit pattern is a valid object and memcpy() creates a valid independent copy of the object.
-//Q_MOVABLE_TYPE specifies that Type has a constructor and/or a destructor but can be moved in memory using memcpy().
-//Q_COMPLEX_TYPE (the default) specifies that Type has constructors and/or a destructor and that it may not be moved in memory."
-//Q_DECLARE_TYPEINFO(HpglDocument, Q_COMPLEX_TYPE);
+Q_DECLARE_METATYPE(HpglDocument)
 
 #endif // HPGLDOCUMENT_H
 

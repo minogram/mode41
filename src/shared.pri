@@ -1,4 +1,41 @@
-ROOTDIR = c:/dev/mode41
+########################
+#
+#   shared.pri
+#
+########################
+
+# change below variable for your environment
+
+SRC_DIR = c:/dev/mode41
+BUILD_DIR = c:/dev/mode41-build
+
+########################
+
+INCLUDEPATH += src \
+    $$SRC_DIR/src/3rdparty/cpplinq \
+    $$SRC_DIR/src/3rdparty/freeimage/x32 \
+    $$SRC_DIR/src/3rdparty/wykobi \
+    $$SRC_DIR/src/modules/qx \
+    $$SRC_DIR/src/modules/dxf \
+    $$SRC_DIR/src/modules/pgm \
+    $$SRC_DIR/src/modules/hpgl \
+
+#LIBS += \
+#    -L$$SRC_DIR/src/3rdparty/freeimage/x32 -lfreeimage \
+#    -L$$BUILD_DIR/src/modules/qx/debug -lqx \
+#    -L$$BUILD_DIR/src/modules/dxf/debug -ldxf \
+#    -L$$BUILD_DIR/src/modules/pgm/debug -lpgm \
+#    -L$$BUILD_DIR/src/modules/hpgl/debug -lhpgl \
+
+LIBS += \
+    -L$$SRC_DIR/src/3rdparty/freeimage/x32 -lfreeimage \
+    -L$$BUILD_DIR/src/modules/qx/release -lqx \
+    -L$$BUILD_DIR/src/modules/dxf/release -ldxf \
+    -L$$BUILD_DIR/src/modules/pgm/release -lpgm \
+    -L$$BUILD_DIR/src/modules/hpgl/release -lhpgl \
+
+
+#########################
 
 release: DESTDIR = release
 debug: DESTDIR = debug

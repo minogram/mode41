@@ -1,10 +1,9 @@
 #ifndef HPGL_H
 #define HPGL_H
 
-#include "hpgl_global.h"
-#include "HpglDocument.h"
 #include "HpglCommand.h"
-#include "HpglPaintable.h"
-#include "HpglTextReader.h"
+#include "HpglDocument.h"
+#include "HpglReader.h"
+#include "HpglPlay.h"
 
 #endif // HPGL_H

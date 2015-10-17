@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += widgets opengl svg
+QT += widgets opengl svg
 
 TARGET = hpgl
 TEMPLATE = lib
@@ -14,20 +14,34 @@ DEFINES += HPGL_LIBRARY
 
 SOURCES += \
     HpglDocument.cpp \
-    HpglPaintable.cpp \
-    HpglTextReader.cpp \
-    HpglCommand.cpp
+    HpglCommand.cpp \
+    HpglReader.cpp \
+    HpglReference.cpp \
+    HpglCommandInfo.cpp \
+    HpglState.cpp \
+    HpglPlay.cpp \
+    HpglPainterPlay.cpp
 
-HEADERS += Hpgl.h\
-        hpgl_global.h \
+HEADERS += \
+    Hpgl.h\
     HpglDocument.h \
-    HpglPaintable.h \
-    HpglTextReader.h \
-    HpglCommand.h
+    HpglCommand.h \
+    HpglReader.h \
+    HpglReference.h \
+    HpglCommandInfo.h \
+    HpglDocument_p.h \
+    HpglCommand_p.h \
+    HpglState.h \
+    HpglPlay.h \
+    HpglPainterPlay.h
 
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
+
+INCLUDEPATH += \
+    ../../3rdparty/wykobi \
+    ../../3rdparty/cpplinq \
 
 include($$PWD/../../shared.pri)

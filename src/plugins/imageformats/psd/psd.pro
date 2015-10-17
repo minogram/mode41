@@ -14,8 +14,6 @@ TARGET = psd
 
 INCLUDEPATH += c:/dev/mode41/src/3rdparty/freeimage/x32
 
-LIBS = -Lc:/dev/mode41/src/3rdparty/freeimage/x32 -lfreeimage
-
 SOURCES += \
     QFreeImage.cpp \
     PsdHandler.cpp \
@@ -26,3 +24,5 @@ HEADERS += \
     PsdHandler.h
 
 OTHER_FILES += pds.json
+
+include($$PWD/../../../shared.pri)
