@@ -4,17 +4,23 @@
 #
 #-------------------------------------------------
 
-QT       += widgets opengl svg xml xmlpatterns
+QT       += core gui xml
 
 TARGET = sketch2010
 TEMPLATE = lib
 CONFIG += staticlib
 
-SOURCES += Sketch2010.cpp \
-    SketchModel.cpp
+SOURCES += \
+    SketchDrawing.cpp \
+    SketchReader.cpp \
+    SketchPlay.cpp
 
-HEADERS += Sketch2010.h \
-    SketchModel.h
+HEADERS += \
+    Sketch.h \
+    SketchDrawing.h \
+    SketchReader.h \
+    SketchPlay.h \
+
 unix {
     target.path = /usr/lib
     INSTALLS += target

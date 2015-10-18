@@ -34,7 +34,7 @@ PRE_TARGETDEPS += \
     C:\dev\mode41-build\src\modules\hpgl\debug\hpgl.lib \
     C:\dev\mode41-build\src\modules\sketch2010\debug\sketch2010.lib \
 
-viewer.depends = dxf hpgl
+viewer.depends = dxf hpgl sketch2010
 
 include($$PWD/../../shared.pri)
 

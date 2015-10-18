@@ -6,5 +6,6 @@ SUBDIRS = \
     3rdparty \
     modules \
     plugins \
-    examples \
     apps \
+
+#    examples \

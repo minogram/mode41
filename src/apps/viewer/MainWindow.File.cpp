@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+#include <QtCore>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QException>
@@ -10,6 +10,8 @@
 #include <QStringList>
 #include <QGraphicsSvgItem>
 #include <QDebug>
+
+#include "MainWindow.h"
 #include "DxfModelReader.h"
 #include "DxfPtnConvert.h"
 #include "PtnModel.h"
@@ -17,7 +19,10 @@
 #include "FreeImage2QImage.h"
 #include "Hpgl.h"
 #include "HpglPainterPlay.h"
-#include "SketchModel.h"
+#include "Sketch.h"
+//#include "SketchDrawing.h"
+//#include "SketchReader.h"
+//#include "SketchPlay.h"
 
 void MainWindow::fileNew()
 {
@@ -196,14 +201,11 @@ void MainWindow::openHpgl(const QFileInfo &fileInfo)
     HpglReader reader;
     auto doc = reader.load(fileInfo.absoluteFilePath());
 
-#if 1 // DRAW_SCENE
-    auto scene = m_view->scene();
-    scene->clear();
-    HpglScenePlay player(doc);
-    player.play(scene);
-#endif
+//    auto scene = m_view->scene();
+//    scene->clear();
+//    HpglScenePlay player(doc);
+//    player.play(scene);
 
-#if 0 // DRAW_PICTURE
     QPicture picture;
     QPainter painter;
     painter.begin(&picture);
@@ -214,15 +216,27 @@ void MainWindow::openHpgl(const QFileInfo &fileInfo)
     scene->clear();
     auto item = new QXGraphicsPictureItem(picture);
     scene->addItem(item);
-#endif
 }
 
 void MainWindow::openSketch(const QFileInfo &fileInfo)
 {
-    SketchModel model;
-    model.load(fileInfo.absoluteFilePath());
+    SketchReader reader;
+    auto drawing = reader.load(fileInfo.absoluteFilePath());
 
-    qDebug() << "sketch";
+    QPicture picture;
+    {
+        QPainter painter;
+        painter.begin(&picture);
+        SketchPlay player(drawing);
+        player.play(&painter);
+        painter.end();
+    }
+    auto scene = m_view->scene();
+    scene->clear();
+    auto item = new QXGraphicsPictureItem(picture);
+    scene->addItem(item);
+
+    delete drawing;
 }
 
 bool MainWindow::maybeSave()
